@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rally Tally — Start the Rally. Close the Tally.</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Unbounded:wght@700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0A0A12; --card:#12121E; --card2:#181828;
+  --gold:#F5A623; --gold2:#FFBE4D; --gold3:#E09820;
+  --red:#E94560; --green:#26BE69;
+  --white:#FFFFFF; --text:#E2E0EE; --muted:#7A7890; --dim:#3A3850;
+  --wrap:920px;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Manrope',sans-serif;
+  background:var(--bg);color:var(--text);
+  overflow-x:hidden;font-size:15px;line-height:1.6;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 70% -10%,rgba(245,166,35,0.07) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at -10% 60%,rgba(233,69,96,0.05) 0%,transparent 55%),
+    repeating-linear-gradient(0deg,transparent,transparent 80px,rgba(255,255,255,0.012) 80px,rgba(255,255,255,0.012) 81px),
+    repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(255,255,255,0.012) 80px,rgba(255,255,255,0.012) 81px);
+  background-color:var(--bg);
+}
+.w{max-width:var(--wrap);margin:0 auto;padding:0 32px}
+
+/* ── PAGE SYSTEM ── */
+.page{display:none}
+.page.active{display:block}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:62px;border-bottom:1px solid rgba(245,166,35,0.12);background:rgba(10,10,18,0.92);backdrop-filter:blur(20px)}
+.nav-w{max-width:var(--wrap);margin:0 auto;padding:0 32px;height:100%;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Unbounded',sans-serif;font-size:17px;font-weight:900;color:var(--white);text-decoration:none;letter-spacing:-0.02em;cursor:pointer;background:none;border:none}
+.logo b{color:var(--gold)}
+.nav-links{display:flex;gap:22px}
+.nav-links a,.nl{color:var(--muted);text-decoration:none;font-size:12px;font-weight:600;letter-spacing:0.02em;transition:color 0.15s;cursor:pointer;background:none;border:none;font-family:'Manrope',sans-serif;padding:0}
+.nav-links a:hover,.nl:hover,.nav-links a.active,.nl.active{color:var(--white)}
+.nav-links a.active,.nl.active{color:var(--gold)}
+.nav-pill{background:var(--gold);color:var(--bg);padding:8px 18px;border-radius:6px;font-size:12px;font-weight:800;text-decoration:none;transition:all 0.15s;font-family:'Manrope',sans-serif;cursor:pointer;border:none;box-shadow:0 4px 20px rgba(245,166,35,0.35)}
+.nav-pill:hover{background:var(--gold2);transform:translateY(-1px)}
+
+/* ── BUTTONS ── */
+.btn{padding:11px 24px;border-radius:6px;font-size:13px;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all 0.15s;font-family:'Manrope',sans-serif;cursor:pointer;border:none}
+.btn-gold{background:var(--gold);color:var(--bg);box-shadow:0 4px 20px rgba(245,166,35,0.35)}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn-ghost{border:1px solid rgba(255,255,255,0.12);color:var(--text);background:rgba(255,255,255,0.03)}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.06)}
+.btn-dark{background:var(--bg);color:var(--gold);border:1px solid rgba(245,166,35,0.3)}
+.btn-dark:hover{background:#14141f}
+.btn-outline-dark{border:1.5px solid rgba(0,0,0,0.25);color:var(--bg);background:transparent}
+.btn-outline-dark:hover{background:rgba(0,0,0,0.08)}
+
+/* ── MARQUEE ── */
+.marquee{background:var(--gold);padding:10px 0;overflow:hidden}
+.marquee-track{display:flex;white-space:nowrap;animation:scroll 22s linear infinite}
+.mi{font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;color:var(--bg);letter-spacing:0.1em;text-transform:uppercase;padding:0 20px;display:flex;align-items:center;gap:12px}
+.md{width:3px;height:3px;background:rgba(0,0,0,0.3);border-radius:50%}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── SECTION COMMONS ── */
+.sec{padding:80px 0;position:relative}
+.sec-alt{background:rgba(255,255,255,0.015)}
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.hdg{font-family:'Unbounded',sans-serif;font-size:clamp(24px,3vw,36px);font-weight:900;letter-spacing:-0.03em;line-height:1.1;color:var(--white);margin-bottom:14px;max-width:480px}
+.hdg .g{color:var(--gold)}
+.body{font-size:14px;color:var(--muted);line-height:1.75;max-width:380px;font-weight:500}
+
+/* ── PAGE HERO ── */
+.pg-hero{padding:120px 0 64px;position:relative;overflow:hidden}
+.pg-hero-glow{position:absolute;width:500px;height:500px;border-radius:50%;pointer-events:none}
+.pg-hero h1{font-family:'Unbounded',sans-serif;font-size:clamp(32px,5vw,60px);font-weight:900;letter-spacing:-0.03em;color:var(--white);line-height:1.0;margin-bottom:20px;max-width:620px}
+.pg-hero h1 .g{color:var(--gold)}
+.pg-hero p{font-size:16px;color:var(--muted);max-width:440px;line-height:1.7;font-weight:500;margin-bottom:32px}
+
+/* ── HOME HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;padding:100px 0 60px;position:relative;overflow:hidden}
+.hero-bg-word{position:absolute;font-family:'Unbounded',sans-serif;font-size:clamp(160px,22vw,320px);font-weight:900;color:transparent;-webkit-text-stroke:1px rgba(245,166,35,0.07);top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;letter-spacing:-0.05em;user-select:none;z-index:0}
+.hero-inner{max-width:var(--wrap);margin:0 auto;padding:0 32px;position:relative;z-index:1;display:grid;grid-template-columns:1fr 380px;gap:60px;align-items:center}
+.live-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(245,166,35,0.25);background:rgba(245,166,35,0.07);color:var(--gold);font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:5px 12px;border-radius:4px;margin-bottom:24px;width:fit-content}
+.live-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(0.7)}}
+.hero h1{font-family:'Unbounded',sans-serif;font-size:clamp(38px,5.5vw,68px);font-weight:900;line-height:1.0;letter-spacing:-0.03em;color:var(--white);margin-bottom:24px}
+.hero h1 .g{color:var(--gold);text-shadow:0 0 40px rgba(245,166,35,0.4)}
+.hero h1 .sk{-webkit-text-stroke:2px rgba(245,166,35,0.6);color:transparent}
+.hero-sub{font-size:15px;color:var(--muted);line-height:1.75;max-width:400px;margin-bottom:32px;font-weight:500}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:40px}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(245,166,35,0.15);border-radius:8px;overflow:hidden;background:rgba(245,166,35,0.03)}
+.hs{padding:14px 16px;border-right:1px solid rgba(245,166,35,0.1)}
+.hs:last-child{border-right:none}
+.hs-n{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:900;color:var(--gold);letter-spacing:-0.02em;line-height:1}
+.hs-l{font-size:9px;color:var(--muted);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em}
+
+/* ── PHONE MOCK ── */
+.phone-wrap{background:linear-gradient(145deg,#1a1830,#0e0e1a);border:1px solid rgba(245,166,35,0.2);border-radius:24px;padding:3px;box-shadow:0 0 0 1px rgba(245,166,35,0.08),0 40px 80px rgba(0,0,0,0.6),0 0 60px rgba(245,166,35,0.08)}
+.phone-inner{background:var(--bg);border-radius:22px;padding:20px;overflow:hidden}
+.phone-notch{width:80px;height:18px;background:#0A0A12;border-radius:0 0 12px 12px;margin:0 auto 16px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.phone-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.phone-title{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:900;color:var(--white)}
+.phone-badge{background:var(--gold);color:var(--bg);font-size:8px;font-weight:800;padding:3px 8px;border-radius:100px;letter-spacing:0.05em;text-transform:uppercase}
+.phone-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.phone-row:last-of-type{border-bottom:none}
+.pr-left{display:flex;align-items:center;gap:9px}
+.pr-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-size:9px;font-weight:900;flex-shrink:0}
+.pr-name{font-size:12px;font-weight:700;color:var(--white);line-height:1}
+.pr-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.pr-amt{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:900;color:var(--gold)}
+.phone-total{margin-top:12px;background:var(--gold);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.pt-lbl{font-size:9px;font-weight:700;color:rgba(0,0,0,0.55);text-transform:uppercase;letter-spacing:0.07em}
+.pt-n{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:900;color:var(--bg)}
+.phone-chip{position:absolute;background:var(--card2);border:1px solid rgba(245,166,35,0.2);border-radius:8px;padding:8px 12px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.chip-1{top:-16px;right:-20px;color:var(--green);border-color:rgba(38,190,105,0.25)}
+.chip-2{bottom:40px;left:-24px;color:var(--gold);border-color:rgba(245,166,35,0.25)}
+.hero-phone{position:relative}
+
+/* ── PROBLEM CARDS ── */
+.prob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:44px;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.12);border-radius:14px;overflow:hidden}
+.prob-card{background:var(--card);padding:28px 24px;transition:background 0.2s;position:relative}
+.prob-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold);transform:scaleX(0);transition:transform 0.2s;transform-origin:left}
+.prob-card:hover{background:var(--card2)}
+.prob-card:hover::before{transform:scaleX(1)}
+.prob-emoji{font-size:28px;margin-bottom:12px;display:block}
+.prob-card h3{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:var(--white);margin-bottom:8px;letter-spacing:-0.01em}
+.prob-card p{font-size:13px;color:var(--muted);line-height:1.65}
+
+/* ── HOW IT WORKS ── */
+.how-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:44px;position:relative}
+.how-wrap::before{content:'';position:absolute;top:22px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(245,166,35,0.4),transparent)}
+.how-step{padding:0 20px;position:relative}
+.step-circle{width:44px;height:44px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-size:15px;font-weight:900;color:var(--bg);margin-bottom:18px;position:relative;z-index:1;box-shadow:0 4px 16px rgba(245,166,35,0.35)}
+.how-step h3{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;color:var(--white);margin-bottom:7px;letter-spacing:-0.01em}
+.how-step p{font-size:12px;color:var(--muted);line-height:1.65}
+
+/* ── BENTO FEATURES ── */
+.bento{display:grid;grid-template-columns:1.4fr 1fr 1fr;grid-template-rows:auto auto;gap:10px;margin-top:44px}
+.bento-card{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:24px;transition:all 0.2s;position:relative;overflow:hidden}
+.bento-card:hover{border-color:rgba(245,166,35,0.2);transform:translateY(-2px)}
+.bento-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transition:transform 0.2s;transform-origin:left}
+.bento-card:hover::after{transform:scaleX(1)}
+.bento-big{grid-row:span 2;background:linear-gradient(145deg,#1e1238 0%,#140e28 50%,#0e0a1e 100%);border-color:rgba(245,166,35,0.2)}
+.bento-big::after{display:none}
+.bento-big-n{font-family:'Unbounded',sans-serif;font-size:80px;font-weight:900;color:var(--gold);line-height:1;margin:20px 0 6px;letter-spacing:-0.05em;text-shadow:0 0 60px rgba(245,166,35,0.3)}
+.bento-big-sub{font-size:11px;color:rgba(245,166,35,0.4);font-weight:600}
+.feat-i{font-size:26px;margin-bottom:12px;display:block}
+.bento-card h3{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:var(--white);margin-bottom:7px;letter-spacing:-0.01em}
+.bento-card p{font-size:12px;color:var(--muted);line-height:1.65}
+
+/* ── REVIEWS ── */
+.reviews{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:44px}
+.rev{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:22px;transition:all 0.2s}
+.rev:hover{border-color:rgba(245,166,35,0.15);transform:translateY(-2px)}
+.rev-stars{display:flex;gap:2px;margin-bottom:10px}
+.s{color:var(--gold);font-size:11px}
+.rev-text{font-size:13px;line-height:1.65;color:var(--text);margin-bottom:16px;font-style:italic}
+.rev-by{display:flex;align-items:center;gap:9px}
+.rev-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-size:10px;font-weight:900;flex-shrink:0}
+.rev-name{font-size:12px;font-weight:700;color:var(--white)}
+.rev-org{font-size:10px;color:var(--muted);margin-top:1px}
+
+/* ── PRICING ── */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:start;margin-top:44px}
+.p-card{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:24px 20px;transition:all 0.2s;position:relative}
+.p-card:hover{transform:translateY(-2px)}
+.p-card.hot{background:linear-gradient(160deg,#1e1238 0%,#180e28 100%);border-color:rgba(245,166,35,0.3);transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 40px rgba(245,166,35,0.08)}
+.p-card.hot:hover{transform:translateY(-8px)}
+.p-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--bg);font-family:'Unbounded',sans-serif;font-size:8px;font-weight:900;padding:3px 14px;border-radius:100px;text-transform:uppercase;letter-spacing:0.1em;white-space:nowrap}
+.p-tier{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.p-price{font-family:'Unbounded',sans-serif;font-size:42px;font-weight:900;letter-spacing:-0.03em;color:var(--white);line-height:1;margin-bottom:3px}
+.p-per{font-size:10px;color:var(--dim);margin-bottom:18px}
+.p-div{height:1px;background:rgba(255,255,255,0.07);margin-bottom:16px}
+.p-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.pf{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted)}
+.pck{width:14px;height:14px;border-radius:50%;background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.2);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--gold);flex-shrink:0;margin-top:1px}
+.p-cta{display:block;text-align:center;padding:10px;border-radius:7px;font-size:12px;font-weight:800;text-decoration:none;transition:all 0.15s;font-family:'Manrope',sans-serif;cursor:pointer;border:none}
+.p-cta.bdr{border:1px solid rgba(255,255,255,0.1);color:var(--text);background:none}
+.p-cta.bdr:hover{border-color:rgba(255,255,255,0.2)}
+.p-cta.gld{background:var(--gold);color:var(--bg)}
+.p-cta.gld:hover{background:var(--gold2)}
+
+/* ── BIG CTA ── */
+.cta-block{background:var(--gold);border-radius:16px;padding:60px 48px;text-align:center;position:relative;overflow:hidden;margin:80px 0}
+.cta-block::before{content:'RALLY';position:absolute;font-family:'Unbounded',sans-serif;font-size:200px;font-weight:900;color:rgba(0,0,0,0.06);top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;letter-spacing:-0.05em;pointer-events:none}
+.cta-block h2{font-family:'Unbounded',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:900;letter-spacing:-0.03em;color:var(--bg);margin-bottom:14px;position:relative}
+.cta-block p{font-size:14px;color:rgba(0,0,0,0.6);max-width:380px;margin:0 auto 28px;line-height:1.65;position:relative}
+.cta-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;position:relative}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid rgba(255,255,255,0.06);padding:48px 0 28px;background:rgba(0,0,0,0.3)}
+.foot-grid{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr;gap:36px;margin-bottom:36px}
+.foot-logo{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:900;color:var(--white);text-decoration:none;display:block;margin-bottom:10px;letter-spacing:-0.02em;cursor:pointer;background:none;border:none;padding:0;font-family:'Unbounded',sans-serif}
+.foot-logo b{color:var(--gold)}
+.foot-desc{font-size:12px;color:var(--muted);line-height:1.65;max-width:200px}
+.foot-col h4{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+.foot-col a,.foot-col button{display:block;font-size:12px;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:7px;transition:color 0.15s;cursor:pointer;background:none;border:none;padding:0;font-family:'Manrope',sans-serif;text-align:left}
+.foot-col a:hover,.foot-col button:hover{color:var(--gold)}
+.foot-bottom{border-top:1px solid rgba(255,255,255,0.05);padding-top:18px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--dim);flex-wrap:wrap;gap:9px}
+.foot-soc{display:flex;gap:7px}
+.soc{width:30px;height:30px;border:1px solid rgba(255,255,255,0.07);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;text-decoration:none;transition:all 0.15s}
+.soc:hover{border-color:rgba(245,166,35,0.3);background:rgba(245,166,35,0.07)}
+
+/* ── PAGE-SPECIFIC STYLES ── */
+
+/* Ambassador page */
+.amb-hero-bg{background:linear-gradient(135deg,#0e0e1a 0%,#1a1030 100%)}
+.perk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px}
+.perk-card{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:32px 26px;transition:all 0.2s;border-left:3px solid var(--gold)}
+.perk-card:hover{transform:translateY(-2px);border-color:rgba(245,166,35,0.3)}
+.perk-icon{font-size:32px;margin-bottom:16px;display:block}
+.perk-card h3{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:9px}
+.perk-card p{font-size:13px;color:var(--muted);line-height:1.65}
+.steps-horiz{display:flex;flex-direction:column;gap:14px;margin-top:40px}
+.step-row{display:flex;align-items:flex-start;gap:18px;padding:20px 22px;background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:12px;transition:all 0.2s}
+.step-row:hover{border-color:rgba(245,166,35,0.2)}
+.step-row-num{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:900;color:rgba(245,166,35,0.2);line-height:1;flex-shrink:0;width:44px}
+.step-row-content h4{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:var(--white);margin-bottom:5px}
+.step-row-content p{font-size:13px;color:var(--muted);line-height:1.6}
+.apply-form{background:var(--card);border:1px solid rgba(245,166,35,0.2);border-radius:16px;padding:40px;max-width:600px;margin:48px auto 0}
+.apply-form h3{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:900;color:var(--white);margin-bottom:8px;text-align:center}
+.apply-form p{font-size:13px;color:var(--muted);text-align:center;margin-bottom:28px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.form-field label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
+.form-field input,.form-field select,.form-field textarea{background:var(--bg);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:10px 12px;font-size:13px;color:var(--white);font-family:'Manrope',sans-serif;outline:none;transition:border-color 0.15s}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--gold)}
+.form-field select{cursor:pointer}
+.form-field textarea{resize:vertical;min-height:90px}
+.form-success{display:none;text-align:center;padding:20px}
+.form-success .check{font-size:48px;margin-bottom:12px;display:block}
+.form-success h4{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:900;color:var(--gold);margin-bottom:8px}
+.form-success p{font-size:14px;color:var(--muted)}
+
+/* Bar Partners page */
+.bar-split{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:44px}
+.bar-perks-list{display:flex;flex-direction:column;gap:12px;margin:24px 0}
+.bar-perk{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:10px;transition:all 0.15s}
+.bar-perk:hover{border-color:rgba(245,166,35,0.2)}
+.bar-perk-icon{font-size:20px;flex-shrink:0;width:28px;text-align:center}
+.bar-perk h4{font-size:13px;font-weight:700;color:var(--white);margin-bottom:3px}
+.bar-perk p{font-size:12px;color:var(--muted);line-height:1.5;margin:0}
+.bar-stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:32px}
+.bar-stat{background:var(--card2);border:1px solid rgba(245,166,35,0.15);border-radius:10px;padding:20px 18px;text-align:center}
+.bar-stat-n{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:900;color:var(--gold);letter-spacing:-0.02em}
+.bar-stat-l{font-size:11px;color:var(--muted);margin-top:5px;font-weight:600}
+.bar-contact-card{background:linear-gradient(135deg,#1a1030,#0e0e1a);border:1px solid rgba(245,166,35,0.2);border-radius:16px;padding:36px;text-align:center}
+.bar-contact-card h3{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:900;color:var(--white);margin-bottom:10px}
+.bar-contact-card p{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.65}
+.how-bars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:44px}
+.how-bar-card{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:28px 22px;text-align:center;transition:all 0.2s}
+.how-bar-card:hover{border-color:rgba(245,166,35,0.2);transform:translateY(-2px)}
+.how-bar-num{font-family:'Unbounded',sans-serif;font-size:40px;font-weight:900;color:rgba(245,166,35,0.2);margin-bottom:12px}
+.how-bar-card h3{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:var(--white);margin-bottom:8px}
+.how-bar-card p{font-size:12px;color:var(--muted);line-height:1.65}
+
+/* About page */
+.about-split{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:44px}
+.about-big-stat{font-family:'Unbounded',sans-serif;font-size:80px;font-weight:900;color:var(--gold);line-height:1;letter-spacing:-0.04em;opacity:0.15;margin-bottom:16px}
+.about-vals{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.about-val{padding:16px 18px;background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:10px;border-left:3px solid var(--gold)}
+.about-val h4{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;color:var(--white);margin-bottom:6px}
+.about-val p{font-size:12px;color:var(--muted);line-height:1.55}
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px}
+.team-card{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:14px;overflow:hidden;transition:all 0.2s}
+.team-card:hover{border-color:rgba(245,166,35,0.2);transform:translateY(-2px)}
+.team-card-top{height:340px;background:linear-gradient(135deg,#1a1030,#0e0a1e);position:relative;display:flex;align-items:center;justify-content:center}
+.team-initials{font-family:'Unbounded',sans-serif;font-size:52px;font-weight:900;color:rgba(245,166,35,0.15);letter-spacing:-0.03em}
+.team-card-body{padding:22px}
+.team-name{font-family:'Unbounded',sans-serif;font-size:15px;font-weight:900;color:var(--white);margin-bottom:4px;letter-spacing:-0.02em}
+.team-title{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:0.04em;margin-bottom:10px}
+.team-bio{font-size:12px;color:var(--muted);line-height:1.65}
+.mission-block{background:linear-gradient(135deg,#1a1030,#0e0a1e);border:1px solid rgba(245,166,35,0.15);border-radius:16px;padding:56px 48px;text-align:center;margin-top:0}
+.mission-block h2{font-family:'Unbounded',sans-serif;font-size:clamp(22px,3vw,34px);font-weight:900;color:var(--white);margin-bottom:16px;letter-spacing:-0.03em}
+.mission-block p{font-size:15px;color:var(--muted);max-width:560px;margin:0 auto;line-height:1.75}
+
+/* Download page */
+.dl-hero{text-align:center;padding:120px 32px 80px}
+.dl-hero h1{font-family:'Unbounded',sans-serif;font-size:clamp(36px,6vw,72px);font-weight:900;color:var(--white);letter-spacing:-0.04em;margin-bottom:20px;line-height:1.0}
+.dl-hero h1 .g{color:var(--gold)}
+.dl-hero p{font-size:17px;color:var(--muted);max-width:440px;margin:0 auto 40px;line-height:1.7;font-weight:500}
+.store-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:60px}
+.store-btn{display:flex;align-items:center;gap:12px;background:var(--white);color:var(--bg);padding:14px 24px;border-radius:12px;text-decoration:none;transition:all 0.2s;border:1px solid rgba(255,255,255,0.1)}
+.store-btn:hover{background:var(--gold);transform:translateY(-2px);box-shadow:0 8px 28px rgba(245,166,35,0.35)}
+.store-btn-icon{font-size:28px;line-height:1}
+.store-btn-text{}
+.store-btn-label{font-size:10px;font-weight:600;opacity:0.6;text-transform:uppercase;letter-spacing:0.08em;display:block}
+.store-btn-name{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:900;letter-spacing:-0.02em;display:block}
+.dl-phone-wrap{max-width:320px;margin:0 auto 80px;position:relative}
+.dl-features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:64px}
+.dl-feat{text-align:center;padding:28px 20px;background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:14px}
+.dl-feat-icon{font-size:32px;margin-bottom:14px;display:block}
+.dl-feat h3{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:var(--white);margin-bottom:7px}
+.dl-feat p{font-size:12px;color:var(--muted);line-height:1.65}
+.steps-dl{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:44px;border:1px solid rgba(255,255,255,0.07);border-radius:12px;overflow:hidden}
+.sdl{padding:26px 22px;border-right:1px solid rgba(255,255,255,0.07)}
+.sdl:last-child{border-right:none}
+.sdl-num{font-family:'Unbounded',sans-serif;font-size:36px;font-weight:900;color:rgba(245,166,35,0.2);line-height:1;margin-bottom:12px}
+.sdl h3{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;color:var(--white);margin-bottom:7px}
+.sdl p{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* Privacy/Terms page */
+.legal-wrap{max-width:700px;margin:0 auto;padding:100px 32px 80px}
+.legal-wrap h1{font-family:'Unbounded',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:900;color:var(--white);margin-bottom:8px;letter-spacing:-0.03em}
+.legal-date{font-size:12px;color:var(--muted);margin-bottom:48px}
+.legal-wrap h2{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;color:var(--gold);margin:36px 0 12px;letter-spacing:-0.01em}
+.legal-wrap p{font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:16px}
+.legal-wrap ul{padding-left:20px;margin-bottom:16px}
+.legal-wrap li{font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:6px}
+
+/* ── NOTIFY MODAL ── */
+.notify-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;align-items:center;justify-content:center;padding:24px}
+.notify-overlay.open{display:flex}
+.notify-modal{background:var(--card);border:1px solid rgba(245,166,35,0.25);border-radius:20px;padding:40px 36px;max-width:440px;width:100%;position:relative;box-shadow:0 40px 80px rgba(0,0,0,0.6),0 0 40px rgba(245,166,35,0.08)}
+.notify-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;padding:4px 8px}
+.notify-close:hover{color:var(--white)}
+.notify-modal h3{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:900;color:var(--white);margin-bottom:8px;letter-spacing:-0.02em}
+.notify-modal p{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.65}
+.notify-form{display:flex;gap:8px}
+.notify-input{flex:1;background:var(--bg);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--white);font-family:'Manrope',sans-serif;outline:none;transition:border-color 0.15s}
+.notify-input:focus{border-color:var(--gold)}
+.notify-input::placeholder{color:var(--muted)}
+.notify-submit{background:var(--gold);color:var(--bg);border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:800;font-family:'Manrope',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.15s}
+.notify-submit:hover{background:var(--gold2)}
+.notify-success{display:none;text-align:center;padding:12px 0}
+.notify-success-icon{font-size:40px;margin-bottom:10px}
+.notify-success h4{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:900;color:var(--gold);margin-bottom:6px}
+.notify-success p{font-size:13px;color:var(--muted)}
+.notify-badges{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.notify-badge{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 14px;flex:1;min-width:140px;opacity:0.5}
+.notify-badge-icon{font-size:20px}
+.notify-badge-text{font-size:10px;font-weight:600;color:var(--muted);line-height:1.3}
+
+/* ── SCROLL FADE ── */
+.fi{opacity:0;transform:translateY(20px);transition:opacity 0.5s ease,transform 0.5s ease}
+.fi.on{opacity:1;transform:translateY(0)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  .nav-links{display:none}
+  .hero-inner,.about-split,.bar-split{grid-template-columns:1fr}
+  .hero-phone{display:none}
+  .prob-grid,.bento,.reviews,.price-grid,.perk-grid,.team-grid,.how-bars-grid,.dl-features{grid-template-columns:1fr}
+  .bento-big{grid-row:auto}
+  .how-wrap,.steps-dl{grid-template-columns:1fr 1fr}
+  .how-wrap::before{display:none}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .hero-stats{grid-template-columns:1fr 1fr}
+  .hs:nth-child(2){border-right:none}
+  .p-card.hot{transform:none}
+  .form-row{grid-template-columns:1fr}
+  .about-vals{grid-template-columns:1fr}
+  .cta-block{padding:48px 28px}
+  .apply-form{padding:28px 20px}
+  .mission-block{padding:40px 24px}
+}
+@media(max-width:520px){
+  .how-wrap,.steps-dl{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-w">
+    <button class="logo" onclick="go('home')">Rally<b>Tally</b></button>
+    <div class="nav-links">
+      <button class="nl" id="n-home" onclick="go('home')">Home</button>
+      <button class="nl" id="n-ambassador" onclick="go('ambassador')">Ambassadors</button>
+      <button class="nl" id="n-bars" onclick="go('bars')">Bar Partners</button>
+      <button class="nl" id="n-about" onclick="go('about')">About</button>
+      <button class="nl" id="n-download" onclick="go('download')">Download</button>
+    </div>
+    <button class="nav-pill" onclick="openNotify()">Get Notified ↓</button>
+  </div>
+</nav>
+
+
+<!-- ══════════════════════════════════════
+     HOME PAGE
+══════════════════════════════════════ -->
+<div id="page-home" class="page active">
+
+<div class="hero">
+  <div class="hero-bg-word">RALLY</div>
+  <div class="hero-inner">
+    <div>
+      <div class="live-badge"><span class="live-dot"></span>Now live on 18+ campuses</div>
+      <h1>Start the<br><span class="g">Rally.</span><br>Close the <span class="sk">Tally.</span></h1>
+      <p class="hero-sub">The only app built for splitting costs on a real night out. Log tabs, Ubers, late-night food — then auto-settle through Venmo in 60 seconds.</p>
+      <div class="hero-btns">
+        <button class="btn btn-gold" onclick="openNotify()">Notify Me When Live ↓</button>
+        <button class="btn btn-ghost" onclick="scrollToId('how')">See How It Works</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hs"><div class="hs-n">18+</div><div class="hs-l">Campuses</div></div>
+        <div class="hs"><div class="hs-n">60s</div><div class="hs-l">To settle</div></div>
+        <div class="hs"><div class="hs-n">$0</div><div class="hs-l">To start</div></div>
+        <div class="hs"><div class="hs-n">∞</div><div class="hs-l">Friends saved</div></div>
+      </div>
+    </div>
+    <div class="hero-phone">
+      <div class="phone-chip chip-1">✓ Settled · $164.50</div>
+      <div class="phone-chip chip-2">⚡ Auto Venmo sent</div>
+      <div class="phone-wrap">
+        <div class="phone-inner">
+          <div class="phone-notch"></div>
+          <div class="phone-header"><div class="phone-title">Friday Night 🍻</div><div class="phone-badge">4 people</div></div>
+          <div class="phone-row"><div class="pr-left"><div class="pr-av" style="background:#F5A623;color:#0A0A12">DK</div><div><div class="pr-name">Darian K.</div><div class="pr-sub">Round 1</div></div></div><div class="pr-amt">+$48.00</div></div>
+          <div class="phone-row"><div class="pr-left"><div class="pr-av" style="background:#3B82F6;color:white">JT</div><div><div class="pr-name">Jake T.</div><div class="pr-sub">Uber home</div></div></div><div class="pr-amt">+$34.50</div></div>
+          <div class="phone-row"><div class="pr-left"><div class="pr-av" style="background:#EC4899;color:white">SR</div><div><div class="pr-name">Sophia R.</div><div class="pr-sub">Late night tacos</div></div></div><div class="pr-amt">+$22.00</div></div>
+          <div class="phone-row"><div class="pr-left"><div class="pr-av" style="background:#8B5CF6;color:white">MK</div><div><div class="pr-name">Madison K.</div><div class="pr-sub">Cover ×4</div></div></div><div class="pr-amt">+$60.00</div></div>
+          <div class="phone-total"><div><div class="pt-lbl">Total Night</div><div style="font-size:9px;color:rgba(0,0,0,0.4);margin-top:1px">Ready to settle</div></div><div class="pt-n">$164.50</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span class="mi">No more awkward Venmo requests<span class="md"></span></span><span class="mi">Split tabs in real time<span class="md"></span></span><span class="mi">Settle in 60 seconds<span class="md"></span></span><span class="mi">Built for Greek life<span class="md"></span></span><span class="mi">Free to download<span class="md"></span></span><span class="mi">Start the Rally. Close the Tally.<span class="md"></span></span><span class="mi">Auto Venmo settlement<span class="md"></span></span><span class="mi">18+ campuses live<span class="md"></span></span>
+    <span class="mi">No more awkward Venmo requests<span class="md"></span></span><span class="mi">Split tabs in real time<span class="md"></span></span><span class="mi">Settle in 60 seconds<span class="md"></span></span><span class="mi">Built for Greek life<span class="md"></span></span><span class="mi">Free to download<span class="md"></span></span><span class="mi">Start the Rally. Close the Tally.<span class="md"></span></span><span class="mi">Auto Venmo settlement<span class="md"></span></span><span class="mi">18+ campuses live<span class="md"></span></span>
+  </div>
+</div>
+
+<div class="sec" id="how">
+  <div class="w">
+    <div class="eyebrow">The Problem</div>
+    <h2 class="hdg">Going out is chaotic.<br>Splitting costs <span class="g">shouldn't be.</span></h2>
+    <div class="prob-grid">
+      <div class="prob-card fi"><span class="prob-emoji">😤</span><h3>Someone always owes someone</h3><p>Every night ends the same. Who covered the round? Did Jake Venmo anyone back? Nobody knows — it festers until Monday.</p></div>
+      <div class="prob-card fi" style="transition-delay:.07s"><span class="prob-emoji">🤦</span><h3>Splitwise is too formal</h3><p>Built for utility bills, not a bar at 1am. Too slow, too much typing, zero vibe. Nobody uses it. The chaos continues.</p></div>
+      <div class="prob-card fi" style="transition-delay:.14s"><span class="prob-emoji">💸</span><h3>$15 shouldn't stress friendships</h3><p>Chasing it feels petty. Not chasing it feels stupid. Rally Tally closes the tab before anyone even gets home.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec sec-alt">
+  <div class="w">
+    <div class="eyebrow">How It Works</div>
+    <h2 class="hdg">Four steps. One night. <span class="g">Done.</span></h2>
+    <div class="how-wrap">
+      <div class="how-step fi"><div class="step-circle">1</div><h3>Start a Rally</h3><p>Create a Tally, add your group. 20 seconds at the pregame and everyone's in.</p></div>
+      <div class="how-step fi" style="transition-delay:.07s"><div class="step-circle">2</div><h3>Log costs live</h3><p>Bars, Ubers, covers, food — log who paid what in real time as it happens.</p></div>
+      <div class="how-step fi" style="transition-delay:.14s"><div class="step-circle">3</div><h3>Close the Tally</h3><p>Night's over — hit close. App calculates who owes who, minimizing total transactions.</p></div>
+      <div class="how-step fi" style="transition-delay:.21s"><div class="step-circle">4</div><h3>Auto-settle via Venmo</h3><p>One tap fires Venmo requests to everyone automatically. Done.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec" id="features">
+  <div class="w">
+    <div class="eyebrow">Features</div>
+    <h2 class="hdg">Everything your night out needs.</h2>
+    <div class="bento">
+      <div class="bento-card bento-big fi"><span class="feat-i">⚡</span><h3>Auto Venmo Settlement</h3><p>Close the Tally and Venmo requests fire automatically to everyone. Zero chasing. Zero math. Just done.</p><div class="bento-big-n">60s</div><div class="bento-big-sub">From close to fully settled</div></div>
+      <div class="bento-card fi" style="transition-delay:.07s"><span class="feat-i">📊</span><h3>Smart Split Engine</h3><p>Handles unequal splits, people who ordered more, and whoever disappeared for 40 min.</p></div>
+      <div class="bento-card fi" style="transition-delay:.1s"><span class="feat-i">🎯</span><h3>Real-Time Tracking</h3><p>Everyone sees costs as they happen. No surprises at the end of the night.</p></div>
+      <div class="bento-card fi" style="transition-delay:.13s"><span class="feat-i">🏆</span><h3>Semester Wrap</h3><p>Your year in nights out — biggest nights, most spent, who you go out with most.</p></div>
+      <div class="bento-card fi" style="transition-delay:.16s"><span class="feat-i">🔗</span><h3>Invite via Link</h3><p>Share a link — anyone joins instantly. No app download required for guests.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec sec-alt">
+  <div class="w">
+    <div class="eyebrow">What People Say</div>
+    <h2 class="hdg">The group chat <span class="g">approved it.</span></h2>
+    <div class="reviews">
+      <div class="rev fi"><div class="rev-stars"><span class="s">★</span><span class="s">★</span><span class="s">★</span><span class="s">★</span><span class="s">★</span></div><p class="rev-text">"Used it for barn party and it saved us 45 min of arguing. Closed the tally in the parking lot and everyone got Venmo'd before we got home."</p><div class="rev-by"><div class="rev-av" style="background:#F5A623;color:#0A0A12">MK</div><div><div class="rev-name">Madison K.</div><div class="rev-org">Kappa Delta · TCU</div></div></div></div>
+      <div class="rev fi" style="transition-delay:.07s"><div class="rev-stars"><span class="s">★</span><span class="s">★</span><span class="s">★</span><span class="s">★</span><span class="s">★</span></div><p class="rev-text">"Nobody in our frat Venmos on time. Now the requests go out automatically. Gotten back like $200 I had just written off."</p><div class="rev-by"><div class="rev-av" style="background:#3B82F6;color:white">JT</div><div><div class="rev-name">Jake T.</div><div class="rev-org">Sigma Chi · TCU</div></div></div></div>
+      <div class="rev fi" style="transition-delay:.14s"><div class="rev-stars"><span class="s">★</span><span class="s">★</span><span class="s">★</span><span class="s">★</span><span class="s">★</span></div><p class="rev-text">"Finally an app that gets not everyone drinks the same amount. The split is actually fair and my friends stopped being weird about money."</p><div class="rev-by"><div class="rev-av" style="background:#EC4899;color:white">SR</div><div><div class="rev-name">Sophia R.</div><div class="rev-org">Pi Phi · TCU</div></div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec" id="pricing">
+  <div class="w">
+    <div class="eyebrow">Pricing</div>
+    <h2 class="hdg">Free to start. <span class="g">Worth upgrading.</span></h2>
+    <p class="body">The core app is always free. Upgrade when you're ready.</p>
+    <div class="price-grid">
+      <div class="p-card fi"><div class="p-tier">Free</div><div class="p-price">$0</div><div class="p-per">forever</div><div class="p-div"></div><div class="p-list"><div class="pf"><div class="pck">✓</div>10 nights history</div><div class="pf"><div class="pck">✓</div>20 receipt scans</div><div class="pf"><div class="pck">✓</div>Auto Venmo settlement</div><div class="pf"><div class="pck">✓</div>Real-time tracking</div><div class="pf"><div class="pck">✓</div>Invite via link</div></div><button class="p-cta bdr" onclick="openNotify()">Notify Me</button></div>
+      <div class="p-card hot fi" style="transition-delay:.07s"><div class="p-badge">Most Popular</div><div class="p-tier">Premium</div><div class="p-price">$3.99</div><div class="p-per">per month</div><div class="p-div"></div><div class="p-list"><div class="pf"><div class="pck">✓</div>Everything in Free</div><div class="pf"><div class="pck">✓</div>Unlimited night history</div><div class="pf"><div class="pck">✓</div>Unlimited receipt scans</div><div class="pf"><div class="pck">✓</div>Advanced stats</div><div class="pf"><div class="pck">✓</div>Saved groups</div><div class="pf"><div class="pck">✓</div>Expense photo memories</div></div><button class="p-cta gld" onclick="openNotify()">Get Premium</button></div>
+      <div class="p-card fi" style="transition-delay:.14s"><div class="p-badge" style="background:var(--green);color:#fff">Save 27%</div><div class="p-tier">Annual</div><div class="p-price">$35</div><div class="p-per">per year · that's $2.92/mo</div><div class="p-div"></div><div class="p-list"><div class="pf"><div class="pck">✓</div>Everything in Premium</div><div class="pf"><div class="pck">✓</div>Best value — 27% cheaper</div><div class="pf"><div class="pck">✓</div>One payment, full year</div><div class="pf"><div class="pck">✓</div>Early access to new features</div><div class="pf"><div class="pck">✓</div>Priority support</div></div><button class="p-cta gld" onclick="openNotify()">Get Annual</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="w"><div class="cta-block fi"><h2>Your group is waiting.</h2><p>Launching soon. Get notified the moment we go live.</p><div class="cta-btns"><button class="btn btn-dark" onclick="openNotify()">Notify Me When Live ↓</button><a href="mailto:dariantx04@icloud.com" class="btn btn-outline-dark">Contact the Team</a></div></div></div>
+
+<footer><div class="w">
+  <div class="foot-grid">
+    <div><button class="foot-logo" onclick="go('home')">Rally<b>Tally</b></button><p class="foot-desc">The going-out expense tracker for real nights out. Start the Rally. Close the Tally.</p></div>
+    <div class="foot-col"><h4>Product</h4><button onclick="scrollToId('how')">How It Works</button><button onclick="scrollToId('features')">Features</button><button onclick="scrollToId('pricing')">Pricing</button><button onclick="go('download')">Download</button></div>
+    <div class="foot-col"><h4>Community</h4><button onclick="go('ambassador')">Ambassadors</button><button onclick="go('bars')">Bar Partners</button><button onclick="go('about')">Greek Life</button></div>
+    <div class="foot-col"><h4>Company</h4><button onclick="go('about')">About Us</button><a href="mailto:dariantx04@icloud.com">Contact</a><button onclick="go('privacy')">Privacy</button><button onclick="go('terms')">Terms</button></div>
+  </div>
+  <div class="foot-bottom"><span>© 2025 Rally Tally · rallytally.app</span><div class="foot-soc"><a href="https://instagram.com/rallytally.app" class="soc">📸</a><a href="#" class="soc">🎵</a><a href="mailto:dariantx04@icloud.com" class="soc">✉️</a></div></div>
+</div></footer>
+</div><!-- /home -->
+
+
+<!-- ══════════════════════════════════════
+     AMBASSADOR PAGE
+══════════════════════════════════════ -->
+<div id="page-ambassador" class="page">
+<div class="pg-hero sec amb-hero-bg" style="padding-top:100px">
+  <div class="pg-hero-glow" style="background:radial-gradient(circle,rgba(245,166,35,0.12) 0%,transparent 65%);top:-100px;right:-100px"></div>
+  <div class="w" style="position:relative;z-index:1">
+    <div class="eyebrow">Ambassador Program</div>
+    <h1 class="fi">Get paid to<br><span class="g">go out.</span></h1>
+    <p class="fi" style="transition-delay:.08s">Become a Rally Tally campus ambassador and earn real rewards for every user you bring in. We want the connector in every chapter — the one everyone knows.</p>
+    <button class="btn btn-gold fi" style="transition-delay:.16s" onclick="document.getElementById('amb-apply').scrollIntoView({behavior:'smooth'})">Apply Now →</button>
+  </div>
+</div>
+
+<div class="sec sec-alt">
+  <div class="w">
+    <div class="eyebrow">Why Ambassador</div>
+    <h2 class="hdg">Real perks.<br>Real <span class="g">impact.</span></h2>
+    <div class="perk-grid">
+      <div class="perk-card fi"><span class="perk-icon">💰</span><h3>Earn Cash & Credits</h3><p>Get rewarded for every verified signup from your referral code. The more people you bring in, the more you earn. Top ambassadors make serious money.</p></div>
+      <div class="perk-card fi" style="transition-delay:.07s"><span class="perk-icon">👕</span><h3>Free Merch & Premium</h3><p>Receive the Rally Tally ambassador kit, lifetime premium access, and exclusive merch drops reserved only for active ambassadors.</p></div>
+      <div class="perk-card fi" style="transition-delay:.14s"><span class="perk-icon">🚀</span><h3>Real Startup Experience</h3><p>Direct line to the founders, a path to equity for top performers, and a legitimate startup role on your resume that actually stands out.</p></div>
+      <div class="perk-card fi" style="transition-delay:.07s"><span class="perk-icon">🎤</span><h3>Campus Influence</h3><p>Be the person who introduced Rally Tally to your campus. Early ambassadors become the faces of the brand in their chapter and community.</p></div>
+      <div class="perk-card fi" style="transition-delay:.14s"><span class="perk-icon">🏆</span><h3>Leaderboard & Bonuses</h3><p>Monthly leaderboards track top ambassadors. Bonuses, special events, and prizes for those who consistently drive the most signups.</p></div>
+      <div class="perk-card fi" style="transition-delay:.21s"><span class="perk-icon">🤝</span><h3>Ambassador Network</h3><p>Connect with other ambassadors across 18+ campuses. Share what's working, get strategies from the team, and grow together.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="w">
+    <div class="eyebrow">How It Works</div>
+    <h2 class="hdg">Simple process.<br><span class="g">Big results.</span></h2>
+    <div class="steps-horiz">
+      <div class="step-row fi"><div class="step-row-num">01</div><div class="step-row-content"><h4>Apply & Get Approved</h4><p>Fill out the form below. We review apps within 48 hours and reach out to approved ambassadors directly. We look for people who are naturally connected and well-known in their chapter.</p></div></div>
+      <div class="step-row fi" style="transition-delay:.07s"><div class="step-row-num">02</div><div class="step-row-content"><h4>Get Your Kit & Code</h4><p>Once approved you get a unique referral code, your ambassador kit, and access to our ambassador Slack. We walk you through everything you need to know.</p></div></div>
+      <div class="step-row fi" style="transition-delay:.14s"><div class="step-row-num">03</div><div class="step-row-content"><h4>Start Your First Rally</h4><p>Use Rally Tally on your next night out. Your referral code automatically tracks everyone who signs up through you — in the app or via your link.</p></div></div>
+      <div class="step-row fi" style="transition-delay:.21s"><div class="step-row-num">04</div><div class="step-row-content"><h4>Earn & Grow</h4><p>Watch your earnings and leaderboard position grow. Top ambassadors get bonus payouts, equity conversations, and first pick on new perks as Rally Tally expands.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec sec-alt" id="amb-apply">
+  <div class="w">
+    <div class="eyebrow">Apply Now</div>
+    <h2 class="hdg">Ready to <span class="g">join the team?</span></h2>
+    <div class="apply-form">
+      <h3>Ambassador Application</h3>
+      <p>Takes 2 minutes. We'll reach out within 48 hours.</p>
+      <div id="applyForm">
+        <div class="form-row">
+          <div class="form-field"><label>First Name</label><input type="text" placeholder="Your first name" id="af-first"></div>
+          <div class="form-field"><label>Last Name</label><input type="text" placeholder="Your last name" id="af-last"></div>
+        </div>
+        <div class="form-field"><label>Email</label><input type="email" placeholder="you@university.edu" id="af-email"></div>
+        <div class="form-row">
+          <div class="form-field"><label>University</label><input type="text" placeholder="e.g. TCU" id="af-school"></div>
+          <div class="form-field"><label>Greek Org (if any)</label><input type="text" placeholder="e.g. Kappa Delta" id="af-org"></div>
+        </div>
+        <div class="form-field">
+          <label>How would you promote Rally Tally?</label>
+          <textarea placeholder="Tell us how you'd get people using it..." id="af-how"></textarea>
+        </div>
+        <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="submitApp()">Submit Application →</button>
+      </div>
+      <div class="form-success" id="applySuccess"><span class="check">🎉</span><h4>Application received!</h4><p>We'll review your application and reach out within 48 hours. Check your email — we're excited to connect.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="w"><div class="cta-block"><h2>The best ambassadors get there first.</h2><p>We're expanding to new campuses every week. Apply now before your campus fills up.</p><div class="cta-btns"><button class="btn btn-dark" onclick="document.getElementById('amb-apply').scrollIntoView({behavior:'smooth'})">Apply Now →</button><button class="btn btn-outline-dark" onclick="go('download')">Download the App</button></div></div></div>
+
+<footer><div class="w"><div class="foot-grid"><div><button class="foot-logo" onclick="go('home')">Rally<b>Tally</b></button><p class="foot-desc">The going-out expense tracker for real nights out.</p></div><div class="foot-col"><h4>Pages</h4><button onclick="go('home')">Home</button><button onclick="go('ambassador')">Ambassadors</button><button onclick="go('bars')">Bar Partners</button><button onclick="go('about')">About</button></div><div class="foot-col"><h4>Product</h4><button onclick="go('download')">Download</button><button onclick="go('home')">Pricing</button></div><div class="foot-col"><h4>Contact</h4><a href="mailto:dariantx04@icloud.com">Email Us</a><a href="https://instagram.com/rallytally.app">@rallytally.app</a></div></div><div class="foot-bottom"><span>© 2025 Rally Tally · rallytally.app</span><div class="foot-soc"><a href="https://instagram.com/rallytally.app" class="soc">📸</a><a href="#" class="soc">🎵</a><a href="mailto:dariantx04@icloud.com" class="soc">✉️</a></div></div></div></footer>
+</div><!-- /ambassador -->
+
+
+<!-- ══════════════════════════════════════
+     BAR PARTNERS PAGE
+══════════════════════════════════════ -->
+<div id="page-bars" class="page">
+<div class="pg-hero sec" style="padding-top:100px;background:linear-gradient(135deg,#0a0a12 0%,#0e0a1a 100%)">
+  <div class="pg-hero-glow" style="background:radial-gradient(circle,rgba(233,69,96,0.08) 0%,transparent 65%);top:-80px;right:-80px"></div>
+  <div class="w" style="position:relative;z-index:1">
+    <div class="eyebrow">Bar Partnerships</div>
+    <h1 class="fi">Put your bar where<br><span class="g">the night is.</span></h1>
+    <p class="fi" style="transition-delay:.08s">Rally Tally users are already at your bar — spending with their groups on real nights out. Partner with us to reach them at the exact moment they decide where to go next.</p>
+    <a href="mailto:dariantx04@icloud.com?subject=Rally Tally Bar Partnership" class="btn btn-gold fi" style="transition-delay:.16s">Partner With Us →</a>
+  </div>
+</div>
+
+<div class="sec sec-alt">
+  <div class="w">
+    <div class="eyebrow">Why Partner</div>
+    <h2 class="hdg">Your customers are<br>already <span class="g">using it.</span></h2>
+    <div class="bar-split">
+      <div>
+        <p class="body" style="margin-bottom:24px">Rally Tally users are college students and young adults who go out regularly — exactly your target demographic. They open the app at the bar, during the night, and when settling up after. That's three high-attention moments when your bar could be in front of them.</p>
+        <div class="bar-perks-list">
+          <div class="bar-perk fi"><div class="bar-perk-icon">📍</div><div><h4>In-app featured placement</h4><p>Your bar appears when users open Rally Tally in your area — directly at the moment they're choosing where to go.</p></div></div>
+          <div class="bar-perk fi" style="transition-delay:.07s"><div class="bar-perk-icon">🎉</div><div><h4>Co-branded ambassador nights</h4><p>We bring Rally Tally ambassadors and their networks to your bar for organized events that drive real foot traffic.</p></div></div>
+          <div class="bar-perk fi" style="transition-delay:.14s"><div class="bar-perk-icon">📊</div><div><h4>Group spend analytics</h4><p>Aggregate, anonymized data on group spending patterns on nights when Rally Tally users are at your venue.</p></div></div>
+          <div class="bar-perk fi" style="transition-delay:.21s"><div class="bar-perk-icon">💬</div><div><h4>Social & digital promotion</h4><p>Your bar featured in Rally Tally's Instagram and TikTok content — reaching our growing college audience organically.</p></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="bar-stats">
+          <div class="bar-stat"><div class="bar-stat-n">18+</div><div class="bar-stat-l">Active campuses where Rally Tally is live</div></div>
+          <div class="bar-stat"><div class="bar-stat-n">21–25</div><div class="bar-stat-l">Core user age range — your ideal customer</div></div>
+          <div class="bar-stat"><div class="bar-stat-n">$0</div><div class="bar-stat-l">Setup cost to get started as a partner</div></div>
+          <div class="bar-stat"><div class="bar-stat-n">4–8</div><div class="bar-stat-l">Average group size on a Rally Tally night</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="w">
+    <div class="eyebrow">How It Works</div>
+    <h2 class="hdg">Simple to set up.<br><span class="g">Immediate impact.</span></h2>
+    <div class="how-bars-grid">
+      <div class="how-bar-card fi"><div class="how-bar-num">01</div><h3>Reach Out</h3><p>Email us or fill out the form below. We set up a quick call to walk through the partnership options and what makes sense for your bar.</p></div>
+      <div class="how-bar-card fi" style="transition-delay:.07s"><div class="how-bar-num">02</div><h3>Get Listed</h3><p>We add your bar to the Rally Tally in-app map and featured placement for your area. Your venue is immediately visible to users nearby.</p></div>
+      <div class="how-bar-card fi" style="transition-delay:.14s"><div class="how-bar-num">03</div><h3>Drive Traffic</h3><p>Ambassador nights, social features, and promotions start driving Rally Tally users through your door — tracked and reported back to you.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec sec-alt">
+  <div class="w" style="display:flex;justify-content:center">
+    <div class="bar-contact-card" style="max-width:600px;width:100%">
+      <h3>Ready to Partner?</h3>
+      <p>Drop us a line and we'll set up a quick call to walk through how a Rally Tally bar partnership works for your venue. No commitment, no cost to explore.</p>
+      <a href="mailto:dariantx04@icloud.com?subject=Rally Tally Bar Partnership Inquiry" class="btn btn-gold" style="display:inline-flex;justify-content:center;width:100%">Email Us to Get Started →</a>
+      <p style="font-size:11px;color:var(--muted);margin-top:14px;margin-bottom:0">Or reach out directly on Instagram <a href="https://instagram.com/rallytally.app" style="color:var(--gold)">@rallytally.app</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="w"><div class="cta-block"><h2>Your regulars are already using Rally Tally.</h2><p>Get in front of them when it matters most. Setup is free and takes one conversation.</p><div class="cta-btns"><a href="mailto:dariantx04@icloud.com?subject=Bar Partnership" class="btn btn-dark">Partner With Us →</a><button class="btn btn-outline-dark" onclick="go('home')">Learn More</button></div></div></div>
+
+<footer><div class="w"><div class="foot-grid"><div><button class="foot-logo" onclick="go('home')">Rally<b>Tally</b></button><p class="foot-desc">The going-out expense tracker for real nights out.</p></div><div class="foot-col"><h4>Pages</h4><button onclick="go('home')">Home</button><button onclick="go('ambassador')">Ambassadors</button><button onclick="go('bars')">Bar Partners</button><button onclick="go('about')">About</button></div><div class="foot-col"><h4>Product</h4><button onclick="go('download')">Download</button><button onclick="go('home')">Pricing</button></div><div class="foot-col"><h4>Contact</h4><a href="mailto:dariantx04@icloud.com">Email Us</a><a href="https://instagram.com/rallytally.app">@rallytally.app</a></div></div><div class="foot-bottom"><span>© 2025 Rally Tally · rallytally.app</span><div class="foot-soc"><a href="https://instagram.com/rallytally.app" class="soc">📸</a><a href="#" class="soc">🎵</a><a href="mailto:dariantx04@icloud.com" class="soc">✉️</a></div></div></div></footer>
+</div><!-- /bars -->
+
+
+<!-- ══════════════════════════════════════
+     ABOUT PAGE
+══════════════════════════════════════ -->
+<div id="page-about" class="page">
+<div class="pg-hero sec" style="padding-top:100px">
+  <div class="pg-hero-glow" style="background:radial-gradient(circle,rgba(245,166,35,0.10) 0%,transparent 65%);top:-100px;left:-80px"></div>
+  <div class="w" style="position:relative;z-index:1">
+    <div class="eyebrow">Our Story</div>
+    <h1 class="fi">Built by people who<br><span class="g">actually go out.</span></h1>
+    <p class="fi" style="transition-delay:.08s">Rally Tally was born out of a real problem — the end-of-night Venmo chaos that every college student knows too well. We built the app we wished existed.</p>
+  </div>
+</div>
+
+<div class="sec sec-alt">
+  <div class="w">
+    <div class="about-split">
+      <div>
+        <div class="eyebrow">The Mission</div>
+        <h2 class="hdg">Make going out<br>about the night,<br><span class="g">not the math.</span></h2>
+        <p class="body" style="margin-bottom:20px">Rally Tally is a going-out expense tracking and Venmo settlement app built specifically for the college going-out experience. Not for splitting rent. Not for tracking subscriptions. For actual nights out — the bars, the Ubers, the late-night food runs, the cover charges.</p>
+        <p class="body">We're targeting college students and Greek life communities across the country — people who go out 2–4 times a week with the same friend groups and have been dealing with the same post-night financial chaos for years.</p>
+      </div>
+      <div>
+        <div class="about-big-stat">RT</div>
+        <div class="about-vals">
+          <div class="about-val"><h4>Free to start</h4><p>Core app is always free. No friction to get your group using it on night one.</p></div>
+          <div class="about-val"><h4>Built for speed</h4><p>20 seconds to start a Tally. 60 seconds to settle a full night. Designed for real life.</p></div>
+          <div class="about-val"><h4>Fairness first</h4><p>Not everyone drinks the same amount. Our split engine handles unequal consumption correctly.</p></div>
+          <div class="about-val"><h4>18+ campuses</h4><p>Already live nationally. Growing every week with new ambassador hires.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="w">
+    <div class="eyebrow">The Team</div>
+    <h2 class="hdg">Who's behind<br><span class="g">Rally Tally.</span></h2>
+    <div class="team-grid" style="grid-template-columns:1fr 1fr;max-width:640px">
+      <div class="team-card fi">
+        <div class="team-card-top" style="background:none;padding:0"><img src="darian.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center 25%" /></div>
+        <div class="team-card-body">
+          <div class="team-name">Darian Doyle</div>
+          <div class="team-title">Co-Founder · CEO</div>
+          <p class="team-bio">Finance & Entrepreneurship major at TCU and Greek life member. Got tired of the post-night Venmo chaos and built Rally Tally from scratch — now running the national launch across campuses.</p>
+        </div>
+      </div>
+      <div class="team-card fi" style="transition-delay:.07s">
+        <div class="team-card-top" style="background:none;padding:0"><img src="duke.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center 25%" /></div>
+        <div class="team-card-body">
+          <div class="team-name">Duke Nicolson</div>
+          <div class="team-title">Co-Founder · CFO</div>
+          <p class="team-bio">Finance & Entrepreneurship major at TCU and Greek life member. Duke drives Rally Tally's business side — from campus partnerships and brand outreach to the financial strategy behind our national expansion.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec sec-alt">
+  <div class="w">
+    <div class="mission-block">
+      <h2>"Start the Rally. Close the Tally."</h2>
+      <p>Every college friend group deals with post-night financial chaos. Nobody knows what they owe. Venmo threads become passive-aggressive. Friendships get stressed over $15. Rally Tally closes the tab before you even get home — so the only thing you're talking about the next morning is how good the night was.</p>
+    </div>
+  </div>
+</div>
+
+<div class="w"><div class="cta-block"><h2>Come build this with us.</h2><p>Become an ambassador, partner your bar, or just download and try it on your next night out.</p><div class="cta-btns"><button class="btn btn-dark" onclick="go('ambassador')">Become an Ambassador</button><button class="btn btn-outline-dark" onclick="openNotify()">Notify Me</button></div></div></div>
+
+<footer><div class="w"><div class="foot-grid"><div><button class="foot-logo" onclick="go('home')">Rally<b>Tally</b></button><p class="foot-desc">The going-out expense tracker for real nights out.</p></div><div class="foot-col"><h4>Pages</h4><button onclick="go('home')">Home</button><button onclick="go('ambassador')">Ambassadors</button><button onclick="go('bars')">Bar Partners</button><button onclick="go('about')">About</button></div><div class="foot-col"><h4>Product</h4><button onclick="go('download')">Download</button><button onclick="go('home')">Pricing</button></div><div class="foot-col"><h4>Contact</h4><a href="mailto:dariantx04@icloud.com">Email Us</a><a href="https://instagram.com/rallytally.app">@rallytally.app</a></div></div><div class="foot-bottom"><span>© 2025 Rally Tally · rallytally.app</span><div class="foot-soc"><a href="https://instagram.com/rallytally.app" class="soc">📸</a><a href="#" class="soc">🎵</a><a href="mailto:dariantx04@icloud.com" class="soc">✉️</a></div></div></div></footer>
+</div><!-- /about -->
+
+
+<!-- ══════════════════════════════════════
+     DOWNLOAD PAGE
+══════════════════════════════════════ -->
+<div id="page-download" class="page">
+<div class="dl-hero">
+  <div class="eyebrow">Download Rally Tally</div>
+  <h1>Free to<br><span class="g">download.</span><br>Free to use.</h1>
+  <p>Available on iOS and Android. Takes 20 seconds to start your first Tally. No credit card, no commitment.</p>
+  <div class="store-btns">
+    <button onclick="openNotify()" class="store-btn" style="cursor:pointer;border:none">
+      <div class="store-btn-icon">🍎</div>
+      <div class="store-btn-text">
+        <span class="store-btn-label">Coming soon to</span>
+        <span class="store-btn-name">App Store</span>
+      </div>
+    </button>
+    <button onclick="openNotify()" class="store-btn" style="cursor:pointer;border:none">
+      <div class="store-btn-icon">▶️</div>
+      <div class="store-btn-text">
+        <span class="store-btn-label">Coming soon to</span>
+        <span class="store-btn-name">Google Play</span>
+      </div>
+    </button>
+  </div>
+  <p style="font-size:13px;color:var(--muted);margin-top:-40px;margin-bottom:60px">Enter your email to be notified the moment we launch 🚀</p>
+  <div class="dl-phone-wrap">
+    <div class="phone-wrap">
+      <div class="phone-inner">
+        <div class="phone-notch"></div>
+        <div class="phone-header"><div class="phone-title">Friday Night 🍻</div><div class="phone-badge">LIVE</div></div>
+        <div class="phone-row"><div class="pr-left"><div class="pr-av" style="background:#F5A623;color:#0A0A12">DK</div><div><div class="pr-name">Darian K.</div><div class="pr-sub">Round 1</div></div></div><div class="pr-amt">+$48.00</div></div>
+        <div class="phone-row"><div class="pr-left"><div class="pr-av" style="background:#3B82F6;color:white">JT</div><div><div class="pr-name">Jake T.</div><div class="pr-sub">Uber home</div></div></div><div class="pr-amt">+$34.50</div></div>
+        <div class="phone-row"><div class="pr-left"><div class="pr-av" style="background:#EC4899;color:white">SR</div><div><div class="pr-name">Sophia R.</div><div class="pr-sub">Tacos</div></div></div><div class="pr-amt">+$22.00</div></div>
+        <div class="phone-total"><div><div class="pt-lbl">Total Night</div></div><div class="pt-n">$164.50</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec sec-alt">
+  <div class="w">
+    <div class="eyebrow">How to Get Started</div>
+    <h2 class="hdg">Up and running in<br><span class="g">under 2 minutes.</span></h2>
+    <div class="steps-dl">
+      <div class="sdl fi"><div class="sdl-num">01</div><h3>Download the App</h3><p>Free on iOS and Android. Search "Rally Tally" or use the links above.</p></div>
+      <div class="sdl fi" style="transition-delay:.07s"><div class="sdl-num">02</div><h3>Create Your Account</h3><p>Sign up with your email or phone number. Takes 30 seconds and no credit card required.</p></div>
+      <div class="sdl fi" style="transition-delay:.14s"><div class="sdl-num">03</div><h3>Start a Tally</h3><p>Hit "Start Rally," name the night, and add your friends. Share a link — they don't even need the app.</p></div>
+      <div class="sdl fi" style="transition-delay:.21s"><div class="sdl-num">04</div><h3>Go Out & Settle Up</h3><p>Log costs through the night, close the Tally when you're done, and let Rally Tally handle the Venmo.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="w">
+    <div class="eyebrow">What You Get for Free</div>
+    <h2 class="hdg">The full experience.<br><span class="g">No paywall.</span></h2>
+    <div class="dl-features">
+      <div class="dl-feat fi"><span class="dl-feat-icon">⚡</span><h3>Auto Venmo Settlement</h3><p>Close the Tally and Venmo requests fire automatically to everyone in your group.</p></div>
+      <div class="dl-feat fi" style="transition-delay:.07s"><span class="dl-feat-icon">📊</span><h3>Smart Split Engine</h3><p>Fair splits that account for who ordered what — not just an even divide.</p></div>
+      <div class="dl-feat fi" style="transition-delay:.14s"><span class="dl-feat-icon">🔗</span><h3>Invite via Link</h3><p>Friends can join your Tally without downloading the app. Zero friction.</p></div>
+      <div class="dl-feat fi" style="transition-delay:.07s"><span class="dl-feat-icon">👥</span><h3>Up to 10 People</h3><p>Free tier supports groups up to 10. Upgrade for unlimited.</p></div>
+      <div class="dl-feat fi" style="transition-delay:.14s"><span class="dl-feat-icon">📱</span><h3>iOS & Android</h3><p>Available on both platforms. Same experience, same speed.</p></div>
+      <div class="dl-feat fi" style="transition-delay:.21s"><span class="dl-feat-icon">🎯</span><h3>Real-Time Updates</h3><p>Everyone sees costs as they're added — no end-of-night surprises.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="w"><div class="cta-block"><h2>Your group is waiting.</h2><p>Launching soon. Be first to know when we go live.</p><div class="cta-btns"><button class="btn btn-dark" onclick="openNotify()">Notify Me When Live ↓</button></div></div></div>
+
+<footer><div class="w"><div class="foot-grid"><div><button class="foot-logo" onclick="go('home')">Rally<b>Tally</b></button><p class="foot-desc">The going-out expense tracker for real nights out.</p></div><div class="foot-col"><h4>Pages</h4><button onclick="go('home')">Home</button><button onclick="go('ambassador')">Ambassadors</button><button onclick="go('bars')">Bar Partners</button><button onclick="go('about')">About</button></div><div class="foot-col"><h4>Product</h4><button onclick="go('download')">Download</button><button onclick="go('privacy')">Privacy</button><button onclick="go('terms')">Terms</button></div><div class="foot-col"><h4>Contact</h4><a href="mailto:dariantx04@icloud.com">Email Us</a><a href="https://instagram.com/rallytally.app">@rallytally.app</a></div></div><div class="foot-bottom"><span>© 2025 Rally Tally · rallytally.app</span><div class="foot-soc"><a href="https://instagram.com/rallytally.app" class="soc">📸</a><a href="#" class="soc">🎵</a><a href="mailto:dariantx04@icloud.com" class="soc">✉️</a></div></div></div></footer>
+</div><!-- /download -->
+
+
+<!-- ══════════════════════════════════════
+     PRIVACY PAGE
+══════════════════════════════════════ -->
+<div id="page-privacy" class="page">
+<div class="legal-wrap">
+  <h1>Privacy Policy</h1>
+  <p class="legal-date">Last updated: April 2025</p>
+  <h2>Information We Collect</h2>
+  <p>Rally Tally collects information you provide directly to us, including your name, email address, phone number, and payment information when you create an account or use our services. We also collect information about how you use the app, including the expenses you log, groups you create, and transactions you initiate.</p>
+  <h2>How We Use Your Information</h2>
+  <p>We use the information we collect to provide, maintain, and improve our services, including processing Venmo settlement requests, calculating expense splits, and enabling group expense tracking. We do not sell your personal information to third parties.</p>
+  <ul>
+    <li>Process your expense tracking and Venmo settlement requests</li>
+    <li>Send you notifications about your active Tallies and settlements</li>
+    <li>Provide customer support and respond to your requests</li>
+    <li>Analyze usage patterns to improve the app experience</li>
+    <li>Send you updates about new features (you can opt out anytime)</li>
+  </ul>
+  <h2>Information Sharing</h2>
+  <p>We share your information with other users in your Tally groups as necessary to provide the service — for example, showing group members what expenses have been logged. We do not share your personal information with advertisers or third-party data brokers.</p>
+  <h2>Venmo Integration</h2>
+  <p>Rally Tally integrates with Venmo to facilitate payments. When you use our Venmo settlement feature, we initiate payment requests on your behalf through Venmo's API. Your Venmo credentials are never stored by Rally Tally. Venmo's privacy policy governs how Venmo handles your data.</p>
+  <h2>Data Security</h2>
+  <p>We use industry-standard security measures to protect your information. However, no method of transmission over the internet is 100% secure. We encourage you to use a strong password and protect your account credentials.</p>
+  <h2>Contact Us</h2>
+  <p>If you have questions about this Privacy Policy, contact us at <a href="mailto:dariantx04@icloud.com" style="color:var(--gold)">dariantx04@icloud.com</a>.</p>
+  <div style="margin-top:40px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
+    <button class="btn btn-gold" onclick="go('home')">← Back to Home</button>
+  </div>
+</div>
+<footer><div class="w"><div class="foot-bottom" style="padding-top:24px;border-top:1px solid rgba(255,255,255,0.06)"><span>© 2025 Rally Tally · rallytally.app</span><button class="foot-logo" style="font-size:14px" onclick="go('home')">Rally<b>Tally</b></button></div></div></footer>
+</div><!-- /privacy -->
+
+
+<!-- ══════════════════════════════════════
+     TERMS PAGE
+══════════════════════════════════════ -->
+<div id="page-terms" class="page">
+<div class="legal-wrap">
+  <h1>Terms of Service</h1>
+  <p class="legal-date">Last updated: April 2025</p>
+  <h2>Acceptance of Terms</h2>
+  <p>By downloading or using Rally Tally, you agree to these Terms of Service. If you do not agree, do not use the app. These terms apply to all users of the Rally Tally platform.</p>
+  <h2>Description of Service</h2>
+  <p>Rally Tally is a mobile application that helps groups of users track shared expenses during social outings and facilitates settlement of those expenses through Venmo. The app is intended for personal, non-commercial use by individuals 18 years of age or older.</p>
+  <h2>User Accounts</h2>
+  <p>You are responsible for maintaining the security of your account and all activities that occur under your account. You agree to provide accurate information when creating your account and to keep it up to date.</p>
+  <h2>Payment Features</h2>
+  <p>Rally Tally uses the Venmo API to initiate payment requests. Rally Tally does not process payments directly and is not responsible for failed, declined, or disputed Venmo transactions. Settlement requests sent through Rally Tally are subject to Venmo's terms of service.</p>
+  <h2>Acceptable Use</h2>
+  <ul>
+    <li>You may not use Rally Tally for any illegal purpose or in violation of any laws</li>
+    <li>You may not attempt to reverse engineer, hack, or disrupt the service</li>
+    <li>You may not use Rally Tally to harass or harm other users</li>
+    <li>You may not create fake accounts or impersonate other users</li>
+  </ul>
+  <h2>Limitation of Liability</h2>
+  <p>Rally Tally is provided "as is" without warranties of any kind. We are not liable for any indirect, incidental, or consequential damages arising from your use of the app, including failed Venmo transactions or disputes between users over expense amounts.</p>
+  <h2>Contact</h2>
+  <p>For questions about these terms, contact us at <a href="mailto:dariantx04@icloud.com" style="color:var(--gold)">dariantx04@icloud.com</a>.</p>
+  <div style="margin-top:40px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
+    <button class="btn btn-gold" onclick="go('home')">← Back to Home</button>
+  </div>
+</div>
+<footer><div class="w"><div class="foot-bottom" style="padding-top:24px;border-top:1px solid rgba(255,255,255,0.06)"><span>© 2025 Rally Tally · rallytally.app</span><button class="foot-logo" style="font-size:14px" onclick="go('home')">Rally<b>Tally</b></button></div></div></footer>
+</div><!-- /terms -->
+
+
+<script>
+// ── PAGE ROUTER ──
+function go(page, anchor) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.nl').forEach(n => n.classList.remove('active'));
+  const nav = document.getElementById('n-' + page);
+  if (nav) nav.classList.add('active');
+  window.scrollTo(0, 0);
+  if (anchor) setTimeout(() => { const a = document.querySelector(anchor); if (a) a.scrollIntoView({behavior:'smooth'}); }, 120);
+  // Re-trigger scroll observer for new page elements
+  setTimeout(initObs, 100);
+}
+
+function scrollToId(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth'});
+}
+
+// ── SCROLL FADE ──
+function initObs() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('on'); });
+  }, {threshold: 0.08});
+  document.querySelectorAll('#page-' + getCurrentPage() + ' .fi').forEach(el => {
+    if (!el.classList.contains('on')) obs.observe(el);
+  });
+}
+
+function getCurrentPage() {
+  const active = document.querySelector('.page.active');
+  return active ? active.id.replace('page-', '') : 'home';
+}
+
+// Initial observe
+document.querySelectorAll('#page-home .fi').forEach(el => {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('on'); });
+  }, {threshold: 0.08});
+  obs.observe(el);
+});
+
+// ── AMBASSADOR FORM ──
+function submitApp() {
+  const first = document.getElementById('af-first').value.trim();
+  const last  = document.getElementById('af-last').value.trim();
+  const email = document.getElementById('af-email').value.trim();
+  const school = document.getElementById('af-school').value.trim();
+  const org   = document.getElementById('af-org').value.trim();
+  const how   = document.getElementById('af-how').value.trim();
+  if (!first || !email) { alert('Please fill in at least your name and email.'); return; }
+
+  fetch('https://formspree.io/f/xdaylkvo', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      name: first + ' ' + last,
+      email: email,
+      university: school,
+      greek_org: org,
+      how_promote: how,
+      _subject: 'New Ambassador Application — ' + first + ' ' + last + ' (' + school + ')',
+      _replyto: email,
+    })
+  }).then(r => {
+    document.getElementById('applyForm').style.display = 'none';
+    document.getElementById('applySuccess').style.display = 'block';
+  }).catch(() => {
+    alert('Something went wrong. Please email us directly at dariantx04@icloud.com');
+  });
+}
+
+// ── SET HOME ACTIVE ON LOAD ──
+document.getElementById('n-home').classList.add('active');
+
+// ── NOTIFY MODAL ──
+function openNotify() {
+  document.getElementById('notifyOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeNotify() {
+  document.getElementById('notifyOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('notifyOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeNotify();
+});
+
+function submitNotify(e) {
+  e.preventDefault();
+  const email = document.getElementById('notifyEmail').value.trim();
+  if (!email) return;
+  const form = document.getElementById('notifyMailchimpForm');
+  const data = new FormData(form);
+  fetch(form.action, { method: 'POST', body: data, mode: 'no-cors' });
+  document.getElementById('notifyFormWrap').style.display = 'none';
+  document.getElementById('notifySuccessWrap').style.display = 'block';
+}
+</script>
+
+<!-- ── NOTIFY ME MODAL ── -->
+<div id="notifyOverlay" class="notify-overlay">
+  <div class="notify-modal">
+    <button class="notify-close" onclick="closeNotify()">✕</button>
+    <div id="notifyFormWrap">
+      <div style="font-size:32px;margin-bottom:12px">🚀</div>
+      <h3>Be first to know.</h3>
+      <p>Rally Tally is launching soon on iOS and Android. Drop your email and we'll notify you the moment it's live.</p>
+      <form id="notifyMailchimpForm" action="https://app.us6.list-manage.com/subscribe/post?u=f5239a81c9cc39cee9fd7d42c&amp;id=59805d05ff&amp;f_id=002df3e0f0" method="post" onsubmit="submitNotify(event)">
+        <div class="notify-form">
+          <input type="email" id="notifyEmail" name="EMAIL" class="notify-input" placeholder="your@email.com" required>
+          <button type="submit" class="notify-submit">Notify Me</button>
+        </div>
+        <!-- Mailchimp anti-bot field — do not remove -->
+        <div style="position:absolute;left:-5000px" aria-hidden="true">
+          <input type="text" name="b_f5239a81c9cc39cee9fd7d42c_59805d05ff" tabindex="-1" value="">
+        </div>
+      </form>
+      <div class="notify-badges">
+        <div class="notify-badge"><div class="notify-badge-icon">🍎</div><div class="notify-badge-text">App Store<br>Coming Soon</div></div>
+        <div class="notify-badge"><div class="notify-badge-icon">▶️</div><div class="notify-badge-text">Google Play<br>Coming Soon</div></div>
+      </div>
+    </div>
+    <div id="notifySuccessWrap" class="notify-success">
+      <div class="notify-success-icon">🎉</div>
+      <h4>You're on the list!</h4>
+      <p>We'll email you the second Rally Tally goes live. Get ready for your next night out.</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
